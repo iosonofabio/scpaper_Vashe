@@ -66,150 +66,257 @@ if __name__ == '__main__':
     for pway, genes_pw in genes_pway.items():
         genes_pway[pway] = [trans.get(g, g) for g in genes_pw]
 
-    print('Dot plot')
-    genes1 = [
-        'Pecam1',
-        'Cdh5',
-        'Sox17',
-        #'Notch1', 'Notch4', 'Bmpr2',
-        #'Bmp2k',
-        'Ptprc',
-        'Runx1',
-        'Gfi1', 'Gfi1b',
-        'Tal1',
-        #'Gata2', 'Erg', 'Fli1', 'Lyl1', 'Lmo2', 'Etv6',
-        ]
-    genes = list(genes1)
-    #for pway, genes_pw in genes_pway.items():
-    #    genes += list(genes_pw)
-    #genes += list(ds.featurenames[ds.featurenames.str.startswith('Col')])
-    #genes += list(ds.featurenames[ds.featurenames.str.startswith('Act')])
+    if True:
+        print('Dot plot')
+        genes = [
+            'Pecam1',
+            'Cdh5',
+            'Sox17',
+            'Gfi1',
+            'Kdr',
+            'Notch1',
+            'Egfl7',
+            #'Bmp2k',
+            'Pou5f1', 'Nanog',
+            'Sox2',
+            'Ephb2',
+            'Col1a1', 'Col2a1', 'Cxcl12',
+            'Ptprc',
+            'Myb',
+            'Runx1',
+            #'Gata2', 'Erg', 'Fli1', 'Lyl1', 'Lmo2', 'Etv6',
+            'Gfi1b',
+            'Tal1',
+            'Itga2b',
+            ]
+        cmap = plt.cm.get_cmap('Reds')
+        size_fun = lambda x: 2 + (x * 130)
+        fig, ax = plt.subplots(figsize=(4.5, 4.5))
+        cluster_order = ['0', '1', '2', '3', '4', '5', '6']
+        ds.plot.dot_plot(
+                group_axis='samples',
+                group_by='cluster_new',
+                group_order=cluster_order,
+                ax=ax,
+                plot_list=genes[::-1],
+                threshold=0.5,
+                size_function=size_fun,
+                color_log=True,
+                layout='vertical',
+                vmin=-1, vmax=1,
+                cmap=cmap,
+        )
+        ax.set_ylabel('Gene')
+        ax.set_xlabel('Cluster')
+        for tk in ax.get_xticklabels():
+            tk.set_rotation(0)
 
-    cmap = plt.cm.get_cmap('Reds')
-    size_fun = lambda x: 2 + (x * 130)
-    fig, ax = plt.subplots(figsize=(4.5, 3.5))
-    cluster_order = ['0', '1', '2', '3', '4', '5', '6']
-    ds.plot.dot_plot(
-            group_axis='samples',
-            group_by='cluster_new',
-            group_order=cluster_order,
-            ax=ax,
-            plot_list=genes[::-1],
-            threshold=0.5,
-            size_function=size_fun,
-            color_log=True,
-            layout='vertical',
-            vmin=-1, vmax=1,
-            cmap=cmap,
-    )
-    ax.set_ylabel('Gene')
-    ax.set_xlabel('Cluster')
-    for tk in ax.get_xticklabels():
-        tk.set_rotation(0)
+        percentage = [0, 25, 50, 75, 100]
+        labels = [str(x) for x in percentage]
+        sizes = [size_fun(0.01 * x) for x in percentage]
+        hs = [ax.scatter([], [], s=s, color='grey') for s in sizes]
+        ax.legend(hs, labels, loc='upper left', bbox_to_anchor=(1.05, 1), bbox_transform=ax.transAxes, title='Fraction expressing:')
 
-    percentage = [0, 25, 50, 75, 100]
-    labels = [str(x) for x in percentage]
-    sizes = [size_fun(0.01 * x) for x in percentage]
-    hs = [ax.scatter([], [], s=s, color='grey') for s in sizes]
-    ax.legend(hs, labels, loc='upper left', bbox_to_anchor=(1.05, 1), bbox_transform=ax.transAxes, title='Fraction expressing:')
+        ax2 = ax.twinx()
+        ax2.set_axis_off()
+        expr = [0.0, 0.5, 1.0]
+        labels = ['$0$', '$1$', '$10$']
+        cmap = ax._singlet_dotmap['level_color_map']
+        hs = [ax.scatter([], [], s=30, color=cmap(x)) for x in expr]
+        ax2.legend(hs, labels, loc='upper left', bbox_to_anchor=(1.05, 0.35), bbox_transform=ax.transAxes, title='Exp level [cptt]:      ')
 
-    ax2 = ax.twinx()
-    ax2.set_axis_off()
-    expr = [0.0, 0.5, 1.0]
-    labels = ['$0$', '$1$', '$10$']
-    cmap = ax._singlet_dotmap['level_color_map']
-    hs = [ax.scatter([], [], s=30, color=cmap(x)) for x in expr]
-    ax2.legend(hs, labels, loc='upper left', bbox_to_anchor=(1.05, 0.35), bbox_transform=ax.transAxes, title='Exp level [cptt]:      ')
+        fig.tight_layout()
+        if args.save:
+            fig.savefig(f'{fig_fdn}/dotplot.png', dpi=300)
+            fig.savefig(f'{fig_fdn}/dotplot.svg')
 
-    fig.tight_layout()
-    if args.save:
-        fig.savefig(f'{fig_fdn}/dotplot.png', dpi=300)
-        fig.savefig(f'{fig_fdn}/dotplot.svg')
+    if False:
+        print('Dot plot (supplementary)')
+        genes1 = [
+            #'Pecam1',
+            #'Cdh5',
+            #'Sox17',
+            #'Notch1', 'Notch4', 'Bmpr2',
+            #'Bmp2k',
+            #'Ptprc',
+            #'Runx1',
+            #'Gfi1', 'Gfi1b',
+            #'Tal1',
+            #'Gata2', 'Erg', 'Fli1', 'Lyl1', 'Lmo2', 'Etv6',
+            ]
+        genes = list(genes1)
+        for pway, genes_pw in genes_pway.items():
+            genes += list(genes_pw)
+        genes += list(ds.featurenames[ds.featurenames.str.startswith('Col')])
+        genes += list(ds.featurenames[ds.featurenames.str.startswith('Act')])
 
-    print('UMAP by cluster')
-    clusters = ds.obs['cluster_new'].unique()
-    cmap = cmap_clusters = dict(zip(clusters, sns.color_palette('husl', n_colors=len(clusters))))
-    fig, ax = plt.subplots(figsize=(3, 3))
-    ds.plot.scatter_reduced(
-            ('umap1', 'umap2'),
-            color_by='cluster_new',
-            color_log=None,
-            ax=ax,
-            alpha=0.3,
-            cmap=cmap,
-    )
-    ax.grid(False)
-    ax.set_axis_off()
-    for cl in clusters:
-        ind = ds.obs['cluster_new'] == cl
-        xm, ym = ds.obs.loc[ind, ['umap1', 'umap2']].mean(axis=0)
-        ax.text(xm, ym, cl, ha='center', va='center')
-    fig.tight_layout()
-    if args.save:
-        fig.savefig(f'{fig_fdn}/UMAP_cluster.png', dpi=300)
+        cmap = plt.cm.get_cmap('Reds')
+        size_fun = lambda x: 2 + (x * 130)
+        fig, ax = plt.subplots(figsize=(4.5, 60))
+        cluster_order = ['0', '1', '2', '3', '4', '5', '6']
+        ds.plot.dot_plot(
+                group_axis='samples',
+                group_by='cluster_new',
+                group_order=cluster_order,
+                ax=ax,
+                plot_list=genes[::-1],
+                threshold=0.5,
+                size_function=size_fun,
+                color_log=True,
+                layout='vertical',
+                vmin=-1, vmax=1,
+                cmap=cmap,
+        )
+        ax.set_ylabel('Gene')
+        ax.set_xlabel('Cluster')
+        for tk in ax.get_xticklabels():
+            tk.set_rotation(0)
 
-    print('UMAPs for Runx1 and Sox17')
-    fig, axs = plt.subplots(2, len(clusters), figsize=(8, 2.5))
-    cluster_order = ['0', '1', '2', '3', '4', '5', '6']
-    for gene, axr in zip(['Runx1', 'Sox17'], axs):
-        axr[0].set_xlabel(gene, rotation=0, ha='right')
-        for cl, ax in zip(cluster_order, axr):
-            if axr[0] == axs[0, 0]:
-                ax.set_title(cl)
+        percentage = [0, 25, 50, 75, 100]
+        labels = [str(x) for x in percentage]
+        sizes = [size_fun(0.01 * x) for x in percentage]
+        hs = [ax.scatter([], [], s=s, color='grey') for s in sizes]
+        ax.legend(hs, labels, loc='upper left', bbox_to_anchor=(1.05, 1), bbox_transform=ax.transAxes, title='Fraction expressing:')
+
+        ax2 = ax.twinx()
+        ax2.set_axis_off()
+        expr = [0.0, 0.5, 1.0]
+        labels = ['$0$', '$1$', '$10$']
+        cmap = ax._singlet_dotmap['level_color_map']
+        hs = [ax.scatter([], [], s=30, color=cmap(x)) for x in expr]
+        ax2.legend(hs, labels, loc='upper left', bbox_to_anchor=(1.05, 0.35), bbox_transform=ax.transAxes, title='Exp level [cptt]:      ')
+
+        fig.tight_layout()
+        if args.save:
+            fig.savefig(f'{fig_fdn}/dotplot_supp.png', dpi=300)
+            fig.savefig(f'{fig_fdn}/dotplot_supp.svg')
+
+    if False:
+        print('UMAP by cluster')
+        clusters = ds.obs['cluster_new'].unique()
+        cmap = cmap_clusters = dict(zip(clusters, sns.color_palette('husl', n_colors=len(clusters))))
+        fig, ax = plt.subplots(figsize=(3, 3))
+        ds.plot.scatter_reduced(
+                ('umap1', 'umap2'),
+                color_by='cluster_new',
+                color_log=None,
+                ax=ax,
+                alpha=0.3,
+                cmap=cmap,
+        )
+        ax.grid(False)
+        ax.set_axis_off()
+        for cl in clusters:
             ind = ds.obs['cluster_new'] == cl
-            ds.obs['is_cluster'] = ind
-            dsp = ds.split('is_cluster')
-            dsp[True].plot.scatter_reduced(
-                    ('umap1', 'umap2'),
-                    color_by=gene,
-                    color_log=True,
-                    ax=ax,
-                    s=35,
-                    alpha=0.02,
-                    cmap='viridis',
-                    vmin=-1, vmax=2
-            )
-            dsp[False].plot.scatter_reduced(
-                    ('umap1', 'umap2'),
-                    ax=ax,
-                    s=15,
-                    alpha=0.01,
-            )
-            ax.set_axis_off()
-            ax.grid(False)
-            if gene == 'Runx1':
-                ax.add_artist(plt.Rectangle(
-                    (0.38, 1.05), 0.24, 0.23, facecolor='none',
-                    transform=ax.transAxes,
-                    edgecolor=cmap_clusters[cl], lw=2, clip_on=False),
-                    )
-    fig.text(0.01, 0.7, 'Runx1')
-    fig.text(0.01, 0.25, 'Sox17')
-    fig.tight_layout(rect=(0.05, 0, 1, 1))
-    if args.save:
-        fig.savefig(f'{fig_fdn}/UMAP_genes.png', dpi=300)
+            xm, ym = ds.obs.loc[ind, ['umap1', 'umap2']].mean(axis=0)
+            ax.text(xm, ym, cl, ha='center', va='center')
+        fig.tight_layout()
+        if args.save:
+            fig.savefig(f'{fig_fdn}/UMAP_cluster.png', dpi=300)
+
+    if False:
+        print('UMAPs for Runx1 and Sox17')
+        fig, axs = plt.subplots(2, len(clusters), figsize=(8, 2.5))
+        cluster_order = ['0', '1', '2', '3', '4', '5', '6']
+        for gene, axr in zip(['Runx1', 'Sox17'], axs):
+            axr[0].set_xlabel(gene, rotation=0, ha='right')
+            for cl, ax in zip(cluster_order, axr):
+                if axr[0] == axs[0, 0]:
+                    ax.set_title(cl)
+                ind = ds.obs['cluster_new'] == cl
+                ds.obs['is_cluster'] = ind
+                dsp = ds.split('is_cluster')
+                dsp[True].plot.scatter_reduced(
+                        ('umap1', 'umap2'),
+                        color_by=gene,
+                        color_log=True,
+                        ax=ax,
+                        s=35,
+                        alpha=0.02,
+                        cmap='viridis',
+                        vmin=-1, vmax=2
+                )
+                dsp[False].plot.scatter_reduced(
+                        ('umap1', 'umap2'),
+                        ax=ax,
+                        s=15,
+                        alpha=0.01,
+                )
+                ax.set_axis_off()
+                ax.grid(False)
+                if gene == 'Runx1':
+                    ax.add_artist(plt.Rectangle(
+                        (0.38, 1.05), 0.24, 0.23, facecolor='none',
+                        transform=ax.transAxes,
+                        edgecolor=cmap_clusters[cl], lw=2, clip_on=False),
+                        )
+        fig.text(0.01, 0.7, 'Runx1')
+        fig.text(0.01, 0.25, 'Sox17')
+        fig.tight_layout(rect=(0.05, 0, 1, 1))
+        if args.save:
+            fig.savefig(f'{fig_fdn}/UMAP_genes.png', dpi=300)
 
 
-    print('Distributions')
-    genes = ['Notch1', 'Notch4', 'Bmpr2']
-    colors = ['seagreen', 'tomato', 'navy']
-    cluster_order = ['0', '1', '2', '3', '4', '5', '6']
-    fig, axs = plt.subplots(len(clusters), len(genes), figsize=(3.8, 6), sharex=True, sharey=True)
-    for cl, axr in zip(cluster_order, axs):
-        dsi = ds.query_samples_by_metadata('cluster_new == @cl', local_dict=locals())
-        axr[0].set_ylabel(cl, rotation=0, ha='right')
-        for gene, ax, color in zip(genes, axr, colors):
-            if axr[0] == axs[0, 0]:
-                ax.set_title(gene)
-            x = np.sort(dsi.counts.loc[gene])
-            y = 1.0 - np.linspace(0, 1, len(x))
-            ax.plot(x, y, lw=2, color=color)
-            ax.set_xscale('log')
-            if ax == axs[-1, 1]:
-                ax.set_xlabel('Gene expression [cptt]')
-    fig.text(0.02, 0.5, 'Cluster', rotation=90)
-    fig.text(0.07, 0.35, 'Fraction of cells expressing > x', rotation=90)
-    fig.tight_layout(rect=(0.1, 0, 1, 1), h_pad=0, w_pad=0)
-    if args.save:
-        fig.savefig(f'{fig_fdn}/distributions.png', dpi=300)
-        fig.savefig(f'{fig_fdn}/distributions.svg')
+    if False:
+        print('Distributions')
+        genes = ['Notch1', 'Notch4', 'Bmpr2']
+        colors = ['seagreen', 'tomato', 'navy']
+        cluster_order = ['0', '1', '2', '3', '4', '5', '6']
+        fig, axs = plt.subplots(len(clusters), len(genes), figsize=(3.8, 6), sharex=True, sharey=True)
+        for cl, axr in zip(cluster_order, axs):
+            dsi = ds.query_samples_by_metadata('cluster_new == @cl', local_dict=locals())
+            axr[0].set_ylabel(cl, rotation=0, ha='right')
+            for gene, ax, color in zip(genes, axr, colors):
+                if axr[0] == axs[0, 0]:
+                    ax.set_title(gene)
+                x = np.sort(dsi.counts.loc[gene])
+                y = 1.0 - np.linspace(0, 1, len(x))
+                ax.plot(x, y, lw=2, color=color)
+                ax.set_xscale('log')
+                if ax == axs[-1, 1]:
+                    ax.set_xlabel('Gene expression [cptt]')
+        fig.text(0.02, 0.5, 'Cluster', rotation=90)
+        fig.text(0.07, 0.35, 'Fraction of cells expressing > x', rotation=90)
+        fig.tight_layout(rect=(0.1, 0, 1, 1), h_pad=0, w_pad=0)
+        if args.save:
+            fig.savefig(f'{fig_fdn}/distributions.png', dpi=300)
+            fig.savefig(f'{fig_fdn}/distributions.svg')
+
+    if False:
+        print('Log fold changes')
+        dsa = ds.average('samples', 'cluster_new')
+        comps = [
+            ('0', '1'),
+            ('0', '2'),
+            ('0', '3'),
+            ('0', '4'),
+            ('0', '5'),
+            ('0', '6'),
+            ('1', '2'),
+            ('1', '3'),
+            ('1', '4'),
+            ('1', '5'),
+            ('1', '6'),
+            ('2', '3'),
+            ('2', '4'),
+            ('2', '5'),
+            ('2', '6'),
+        ]
+        cls = dsa.samplenames.sort_values()
+        res = []
+        for cl1, cl2 in comps:
+            gene_order = (np.log2(0.1 + dsa.counts[cl1]) - np.log2(0.1 + dsa.counts[cl2])).sort_values(ascending=False)
+            gene_order.name = 'log2 fold change [cl1 - cl2]'
+            gene_order.index.name = 'sorted genes (upregulated to downregulated)'
+            res.append({
+                'cluster 1': cl1,
+                'cluster 2': cl2,
+                'deg': gene_order,
+            })
+
+        with pd.ExcelWriter('../../data/gene_lists/DEG_cluster_new.xlsx') as f:
+            for resi in res:
+                sheetname = resi['cluster 1'] + ' vs ' + resi['cluster 2']
+                resi['deg'].to_excel(f, sheet_name=sheetname)
+
+
